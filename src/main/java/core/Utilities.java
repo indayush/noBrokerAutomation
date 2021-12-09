@@ -122,8 +122,9 @@ public class Utilities extends Base {
 //			Action keydown = actionProvider.keyDown(Keys.CONTROL).sendKeys(Character.toString(s)).build();
 //			keydown.perform();
 
-			Thread.sleep(100);
+			Thread.sleep(50);
 		}
+		Thread.sleep(1000);
 
 	}
 
