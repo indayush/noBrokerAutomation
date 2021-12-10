@@ -1,6 +1,7 @@
 package tests;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -12,11 +13,11 @@ public class NoBrokerTest extends Base {
 
 	NoBroker oNoBroker;
 
-	@Test(description = "Validate Webpage Title")
+	@Test(description = "Validate Webpage Title", priority = 1)
 	public void validateNoBrokerPageIsOpened() {
 		try {
-			System.out.println(this.getClass().getName());
 
+			// Validating correct Weeb Page is opened by validating page title
 			oNoBroker = new NoBroker(driver);
 			oNoBroker.openApp();
 
@@ -26,23 +27,30 @@ public class NoBrokerTest extends Base {
 			if (pageTitle.equals(Utilities.getConfigProperty("title"))) {
 				Utilities.assertion(true, "Page Title is matched as - " + pageTitle);
 			} else {
-				Utilities.assertion(false, "Page Title is matched as - " + pageTitle);
-			}
 
+				driver.navigate().refresh();
+				Utilities.waitForPageLoaded(30);
+
+				if (pageTitle.equals(Utilities.getConfigProperty("title"))) {
+					Utilities.assertion(true, "Page Title is matched as - " + pageTitle);
+				} else {
+					Utilities.assertion(false, "Page Title is matched as - " + pageTitle);
+				}
+
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	@Test(description = "Property Search on the homepage")
+	@Test(description = "Property Search on the homepage", priority = 2)
 	public void validatePropertySearch() {
 
 		try {
 			oNoBroker = new NoBroker(driver);
 			oNoBroker.openApp();
 
-			// Clicking the But Tab Button
+			// Clicking the Buy Tab Button
 			oNoBroker.buttonTabBuy.click();
 
 			// Checking if provided City is selected
@@ -74,7 +82,7 @@ public class NoBrokerTest extends Base {
 				}
 			}
 
-			// Enter locations on Search box
+			// Enter locations on Search box (Currently only for Mumbai)
 
 			oNoBroker.enterLocationValuesInSearchBoxViaAction(oNoBroker.inputHomepageSearch,
 					Utilities.getConfigProperty("maladEastBefore"));
@@ -90,14 +98,11 @@ public class NoBrokerTest extends Base {
 
 			oNoBroker.selectorForApartmentType.click();
 			Thread.sleep(2000);
-			
 
 			String[] bhkArray = Utilities.getConfigProperty("BHK").split(",");
 			for (String s : bhkArray) {
 
 				for (WebElement eApartmentType : oNoBroker.checkBoxesForApartmentTypes) {
-
-//					System.out.println(e.getAttribute("value"));
 
 					if (eApartmentType.getAttribute("value").equals("BHK" + s)) {
 						eApartmentType.click();
@@ -122,7 +127,7 @@ public class NoBrokerTest extends Base {
 
 	}
 
-	@Test(description = "Select the fourth Listing from search results page")
+	@Test(description = "Select the fourth Listing from search results page", priority = 3)
 	public void selectFourthListing() {
 
 		try {
@@ -136,12 +141,19 @@ public class NoBrokerTest extends Base {
 			int listingSelectCount = Integer.valueOf(Utilities.getConfigProperty("listingSelectCount"));
 
 			Utilities.scrollToElement(driver, oNoBroker.cardsOfPropertyListing.get(listingSelectCount));
-			oNoBroker.cardsOfPropertyListing.get(listingSelectCount).click();
 			Thread.sleep(2000);
-			
-			
+
+			try {
+				oNoBroker.cardsOfPropertyListing.get(listingSelectCount).click();
+			} catch (ElementClickInterceptedException e) {
+				Utilities.clickElementByJS(oNoBroker.cardsOfPropertyListing.get(listingSelectCount));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			Thread.sleep(2000);
+
 			for (String handle : driver.getWindowHandles()) {
-//				System.out.println("Current Window Handle - " + handle);
 
 				if (!driver.getWindowHandle().equals(handle)) {
 					driver.switchTo().window(handle);

@@ -1,7 +1,5 @@
 package core;
 
-import static org.testng.Assert.assertTrue;
-
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -18,12 +16,15 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.Reporter;
 
 public class Utilities extends Base {
 	public static FileReader file = null;
 
 	public static String getConfigProperty(String key) {
 
+		debugMessage("Fetching Config values for " + key);
 		Properties p = new Properties();
 
 		try {
@@ -43,6 +44,7 @@ public class Utilities extends Base {
 
 	public static boolean waitForElementToBeDisplayed(WebElement element, int maxTimeout) throws InterruptedException {
 
+		debugMessage("Waiting for element to be displayed");
 		boolean result = false;
 		for (int i = 0; i < maxTimeout; i++) {
 			Thread.sleep(1000);
@@ -55,34 +57,16 @@ public class Utilities extends Base {
 		return result;
 	}
 
-	public static boolean waitForPageLoad(WebDriver driver) throws InterruptedException {
-		boolean isLoaded = false;
-		int maxTimeout = 60;
-		Thread.sleep(2000);
-
-		try {
-			ExpectedCondition<Boolean> pageLoadViaJS = new ExpectedCondition<Boolean>() {
-				public Boolean apply(WebDriver driver) {
-					return ((JavascriptExecutor) driver).executeScript("return document.readystate").equals("complete");
-				}
-			};
-
-			@SuppressWarnings("deprecation")
-			WebDriverWait wait = new WebDriverWait(driver, maxTimeout);
-			wait.until(pageLoadViaJS);
-			isLoaded = true;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return isLoaded;
-	}
-
 	public static void assertion(boolean assertInputBoolean, String assertMessage) {
 
 		try {
-			assertTrue(assertInputBoolean, assertMessage);
+			if (assertInputBoolean == true) {
+				Assert.assertEquals(true, assertInputBoolean, assertMessage);
+			} else {
+				Assert.assertEquals(true, assertInputBoolean, assertMessage);
+			}
+
+			Reporter.log(assertMessage);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,11 +76,13 @@ public class Utilities extends Base {
 	public static void openApp(WebDriver driver) {
 
 		try {
+			debugMessage("Opening URL = ");
 			driver.manage().window().maximize();
 			driver.get(Utilities.getConfigProperty("url"));
-			Utilities.waitForPageLoad(driver);
+			debugMessage("Opening URL = " + Utilities.getConfigProperty("url"));
+			waitForPageLoaded(30);
 
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -121,19 +107,17 @@ public class Utilities extends Base {
 		for (char s : inputString.toCharArray()) {
 			Actions action = new Actions(driver);
 			action.sendKeys(element, Character.toString(s)).build().perform();
-
-//			Actions actionProvider = new Actions(driver);
-//			Action keydown = actionProvider.keyDown(Keys.CONTROL).sendKeys(Character.toString(s)).build();
-//			keydown.perform();
-
 			Thread.sleep(50);
 		}
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 
 	}
 
 	public static void pressKeysViaRobot(String data) throws Exception {
 		try {
+
+			debugMessage("Pressing Keys via Robot for " + data);
+
 			Robot robot = new Robot();
 			Thread.sleep(2000);
 			byte[] bytes = data.getBytes();
@@ -185,39 +169,52 @@ public class Utilities extends Base {
 	public static void scrollToElement(WebDriver driver, WebElement element) {
 
 		try {
-			
+
 			int maxMsgLength = 50;
-			debugMessage("Scrolling to element = " + StringUtils.abbreviate(element.getText().toString(), maxMsgLength));
+
 			Actions actions = new Actions(driver);
 			actions.moveToElement(element);
 			actions.perform();
+
+			debugMessage("Scrolling to element with text = "
+					+ StringUtils.abbreviate(element.getText().toString(), maxMsgLength));
 			Thread.sleep(4000);
 
 		} catch (MoveTargetOutOfBoundsException e) {
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void waitForPageLoaded(int maxTimeOut) {
+	public static void waitForPageLoaded(int maxTimeOut) throws InterruptedException {
 		final int max = maxTimeOut;
-		
-        ExpectedCondition<Boolean> expectation = new
-                ExpectedCondition<Boolean>() {
-                    public Boolean apply(WebDriver driver) {
-                    	debugMessage("Waiting for page load. Max Timeout = " + String.valueOf(max));
-                        return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString().equals("complete");
-                    }
-                };
-        try {
-            Thread.sleep(1000);
-            @SuppressWarnings("deprecation")
+		Thread.sleep(1000);
+
+		ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver driver) {
+				debugMessage("Waiting for page load. Max Timeout = " + String.valueOf(max));
+				return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString()
+						.equals("complete");
+			}
+		};
+		try {
+			Thread.sleep(1000);
+			@SuppressWarnings("deprecation")
 			WebDriverWait wait = new WebDriverWait(driver, maxTimeOut);
-            wait.until(expectation);
-        } catch (Throwable error) {
-        	assertion(false,"Timeout waiting for Page Load Request to complete");
-        }
-    }
+			wait.until(expectation);
+		} catch (Throwable error) {
+			assertion(false, "Timeout waiting for Page Load Request to complete");
+		}
+	}
+
+	public static void clickElementByJS(WebElement element) {
+		try {
+			JavascriptExecutor js = ((JavascriptExecutor) driver);
+			js.executeScript("arguments[0].click();", element);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -15,7 +16,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 
-public class Base {
+public class Base implements ITestListener{
 
 	public static WebDriver driver = null;
 	public static String chromeProperty = "webdriver.chrome.driver";

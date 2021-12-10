@@ -60,11 +60,12 @@ public class NoBroker {
 	public void openApp() {
 
 		try {
+			
 			System.out.println("Launching Webpage URL");
 			driver.manage().window().maximize();
 			driver.get(Utilities.getConfigProperty("url"));
-//			Utilities.waitForPageLoad(driver);
 			Utilities.waitForPageLoaded(30);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,6 +75,7 @@ public class NoBroker {
 	public void enterLocationValuesInSearchBoxViaAction(WebElement element, String inputString)
 			throws InterruptedException {
 
+		Utilities.debugMessage("Searching for " + inputString);
 		Actions action = new Actions(driver);
 		inputHomepageSearch.click();
 		Thread.sleep(1000);
@@ -83,7 +85,8 @@ public class NoBroker {
 		action.sendKeys(element, Keys.ARROW_DOWN).build().perform();
 		Thread.sleep(200);
 		action.sendKeys(element, Keys.RETURN).build().perform();
-
+		Thread.sleep(200);
+		
 	}
 
 	public void enterLocationValuesInSearchBoxViaRobot(WebElement element, String inputString) throws Exception {
