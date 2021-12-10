@@ -12,7 +12,7 @@ TestNG
 ## Configuration in Project
 
 Some of the values are fetched dynamically from the Config.properties file located in the `.\Resources\config.properties` directory
-e.g. The test can be run on both Chrome Driver & MS Edge Driver. To switch between the given `Browser` values
+e.g. The test can be run on both Chrome Driver & MS Edge Driver. To switch between them, use one of the given `Browser` values
 
 ## Pre-Requisites
 
