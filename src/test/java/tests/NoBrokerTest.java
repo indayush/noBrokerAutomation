@@ -35,7 +35,7 @@ public class NoBrokerTest extends Base {
 		}
 	}
 
-	@Test(description = "Validate Property Search"/* , dependsOnGroups = "validateNoBrokerPageIsOpened" */)
+	@Test(description = "Property Search on the homepage")
 	public void validatePropertySearch() {
 
 		try {
@@ -56,8 +56,7 @@ public class NoBrokerTest extends Base {
 				Utilities.assertion(true, "Selected City = " + cityToSelect);
 			} else {
 
-				@SuppressWarnings("unused")
-				String dynamicXpath = null;
+				String dynamicCityXpath = null;
 				String initialCity = oNoBroker.citySelector.getText();
 
 				if (!initialCity.equals(cityToSelect)) {
@@ -65,9 +64,9 @@ public class NoBrokerTest extends Base {
 					oNoBroker.citySelector.click();
 					Thread.sleep(1000);
 
-					dynamicXpath = "(//div[text()='Buy']/parent::div/following::div//div[text()='" + cityToSelect
+					dynamicCityXpath = "(//div[text()='Buy']/parent::div/following::div//div[text()='" + cityToSelect
 							+ "'])";
-					WebElement selectCityElement = driver.findElement(By.xpath(dynamicXpath));
+					WebElement selectCityElement = driver.findElement(By.xpath(dynamicCityXpath));
 					selectCityElement.click();
 					Thread.sleep(1000);
 
@@ -77,56 +76,93 @@ public class NoBrokerTest extends Base {
 
 			// Enter locations on Search box
 
-			String location_1 = Utilities.getConfigProperty("maladEastBefore");
-			String location_2 = Utilities.getConfigProperty("maladWestBefore");
+			oNoBroker.enterLocationValuesInSearchBoxViaAction(oNoBroker.inputHomepageSearch,
+					Utilities.getConfigProperty("maladEastBefore"));
+			oNoBroker.enterLocationValuesInSearchBoxViaAction(oNoBroker.inputHomepageSearch,
+					Utilities.getConfigProperty("maladWestBefore"));
 
-//			oNoBroker.enterLocationValuesInSearchBoxViaAction(oNoBroker.inputHomepageSearch, location_1);
-//
-//			oNoBroker.enterLocationValuesInSearchBoxViaAction(oNoBroker.inputHomepageSearch, location_2);
-//			oNoBroker.enterLocationValuesInSearchBoxViaRobot(oNoBroker.inputHomepageSearch, location_1);
+			/*
+			 * oNoBroker.enterLocationValuesInSearchBoxViaRobot(oNoBroker.
+			 * inputHomepageSearch, Utilities.getConfigProperty("maladEastBefore"));
+			 */
 
-			// Select the BHKs
-			oNoBroker.selectorForBHKType.click();
-			Thread.sleep(1000);
+			// Select the Apartment Type
+
+			oNoBroker.selectorForApartmentType.click();
+			Thread.sleep(2000);
 			
-			String valueAttributeForBHKSelectorAfterSelectingAnyObject = "";
-			
-			
+
 			String[] bhkArray = Utilities.getConfigProperty("BHK").split(",");
 			for (String s : bhkArray) {
 
-				for (WebElement e : oNoBroker.checkBoxesForBHKTypes) {
-					
-					if (e.getAttribute("value").equals("BHK" + s)) {
-						System.out.println(e.getAttribute("value"));
-						e.click();
+				for (WebElement eApartmentType : oNoBroker.checkBoxesForApartmentTypes) {
+
+//					System.out.println(e.getAttribute("value"));
+
+					if (eApartmentType.getAttribute("value").equals("BHK" + s)) {
+						eApartmentType.click();
+						Utilities.debugMessage("Selected Apartment Type = " + "BHK" + s);
 						Thread.sleep(1000);
-//						valueAttributeForBHKSelectorAfterSelectingAnyObject = s + " BHK" ;
-//						String dynamicXpathForBHKSelector = "//div[text()='" + valueAttributeForBHKSelectorAfterSelectingAnyObject
-//								+ "']/parent::div/parent::div";
-//						WebElement tempBHKSelector = driver.findElement(By.xpath(dynamicXpathForBHKSelector));
-//						tempBHKSelector.click();
 					}
-					Thread.sleep(100);
+
 				}
 
 			}
-			
-			
+
+			oNoBroker.selectorForApartmentType.click();
+			Thread.sleep(1000);
+
 			// Click on Search Button
 			Thread.sleep(2000);
 			oNoBroker.buttonHomepageSearch.click();
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	@Test(priority = 0)
-	public void selectBuyPropertyOptionOnHomepage() {
+	@Test(description = "Select the fourth Listing from search results page")
+	public void selectFourthListing() {
 
+		try {
+
+			Thread.sleep(4000);
+
+			int noOfListings = oNoBroker.cardsOfPropertyListing.size();
+
+			Utilities.debugMessage("No. of Listings = " + noOfListings);
+
+			int listingSelectCount = Integer.valueOf(Utilities.getConfigProperty("listingSelectCount"));
+
+			Utilities.scrollToElement(driver, oNoBroker.cardsOfPropertyListing.get(listingSelectCount));
+			oNoBroker.cardsOfPropertyListing.get(listingSelectCount).click();
+			Thread.sleep(2000);
+			
+			
+			for (String handle : driver.getWindowHandles()) {
+//				System.out.println("Current Window Handle - " + handle);
+
+				if (!driver.getWindowHandle().equals(handle)) {
+					driver.switchTo().window(handle);
+					Utilities.waitForPageLoaded(20);
+					Utilities.debugMessage("Switched to Window Handle = " + handle);
+				}
+			}
+
+			Utilities.scrollToElement(driver, oNoBroker.resultPageDescriptionSection);
+			Thread.sleep(4000);
+
+			String descriptionSize = oNoBroker.resultPageDescriptionSection.getText().toString();
+			if (descriptionSize.length() > 0) {
+				Utilities.assertion(true, "The description for the property is present");
+			} else {
+				Utilities.assertion(false, "The description for the property is present");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

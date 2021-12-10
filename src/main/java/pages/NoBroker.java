@@ -38,18 +38,21 @@ public class NoBroker {
 
 	@FindBy(xpath = "//button[text()='Search']")
 	public WebElement buttonHomepageSearch;
-	
-	@FindBy(xpath = "//div[text()='Apartment Type']/parent::div/parent::div")
-	public WebElement selectorForBHKType;
-	
-	@FindBy(xpath = "//div[text()='Apartment Type']/parent::div/parent::div/following::div/div[@class='nb-checkbox checkbox']//input")
-	public List<WebElement> checkBoxesForBHKTypes;
 
-	@FindBy(xpath = "//div[text()='Apartment Type']/parent::div/parent::div/following::div/div[@class='nb-checkbox checkbox']//span")
-	public List<WebElement> namesForBHKTypes;
+	@FindBy(xpath = "(//div[@class='css-1pcexqc-container nb-select-container'])[2]")
+	public WebElement selectorForApartmentType;
+
+	@FindBy(xpath = "//div[@class='nb-select form-group nb-select__sm']//div[contains(@id,'react-select-3-option')]//input")
+	public List<WebElement> checkBoxesForApartmentTypes;
+
+	@FindBy(xpath = "//div[@class='nb-select form-group nb-select__sm']//div[contains(@id,'react-select-3-option')]//span")
+	public List<WebElement> namesForApartmentTypes;
 
 	@FindBy(xpath = "//article/div[2]")
-	public List<WebElement> cardsOnProperties;
+	public List<WebElement> cardsOfPropertyListing;
+
+	@FindBy(xpath = "(//article/div[2])//section//a[@target='_blank']/h2/span")
+	public List<WebElement> titleOnCardsOfPropertyListing;
 
 	@FindBy(xpath = "//div[@id='description']")
 	public WebElement resultPageDescriptionSection;
@@ -61,7 +64,7 @@ public class NoBroker {
 			driver.manage().window().maximize();
 			driver.get(Utilities.getConfigProperty("url"));
 //			Utilities.waitForPageLoad(driver);
-
+			Utilities.waitForPageLoaded(30);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -87,7 +90,7 @@ public class NoBroker {
 
 		element.click();
 		Thread.sleep(1000);
-		
+
 		Utilities.pressKeysViaRobot(inputString);
 		Thread.sleep(2000);
 		Actions action = new Actions(driver);

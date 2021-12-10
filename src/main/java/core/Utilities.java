@@ -1,6 +1,5 @@
 package core;
 
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.awt.Robot;
@@ -11,10 +10,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -78,12 +79,12 @@ public class Utilities extends Base {
 		return isLoaded;
 	}
 
-	public static void assertion(boolean assertInput, String assertMessage) {
+	public static void assertion(boolean assertInputBoolean, String assertMessage) {
 
-		if (assertInput) {
-			assertTrue(assertInput, assertMessage);
-		} else {
-			assertFalse(assertInput, assertMessage);
+		try {
+			assertTrue(assertInputBoolean, assertMessage);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -104,7 +105,10 @@ public class Utilities extends Base {
 	public static void debugMessage(String sDebugMessage) {
 		try {
 			if (isDevModeEnabled == true) {
+				System.out.println("------------------------------------------------------------");
 				System.out.println("DEBUG: " + sDebugMessage);
+				System.out.println("------------------------------------------------------------");
+				System.out.println();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -177,4 +181,43 @@ public class Utilities extends Base {
 			e.printStackTrace();
 		}
 	}
+
+	public static void scrollToElement(WebDriver driver, WebElement element) {
+
+		try {
+			
+			int maxMsgLength = 50;
+			debugMessage("Scrolling to element = " + StringUtils.abbreviate(element.getText().toString(), maxMsgLength));
+			Actions actions = new Actions(driver);
+			actions.moveToElement(element);
+			actions.perform();
+			Thread.sleep(4000);
+
+		} catch (MoveTargetOutOfBoundsException e) {
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void waitForPageLoaded(int maxTimeOut) {
+		final int max = maxTimeOut;
+		
+        ExpectedCondition<Boolean> expectation = new
+                ExpectedCondition<Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                    	debugMessage("Waiting for page load. Max Timeout = " + String.valueOf(max));
+                        return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString().equals("complete");
+                    }
+                };
+        try {
+            Thread.sleep(1000);
+            @SuppressWarnings("deprecation")
+			WebDriverWait wait = new WebDriverWait(driver, maxTimeOut);
+            wait.until(expectation);
+        } catch (Throwable error) {
+        	assertion(false,"Timeout waiting for Page Load Request to complete");
+        }
+    }
 }

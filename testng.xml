@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Suite">
-	<test thread-count="5" name="Test">
+	<test thread-count="5"
+		name="Verify search functionality for the multiple locality and description tag for
+the property">
 		<classes>
 			<class name="tests.NoBrokerTest">
 				<methods>
+
 					<include name="validateNoBrokerPageIsOpened" />
-					<include name="myTest" />
+					<include name="validatePropertySearch" />
+					<include name="selectFourthListing" />
+
 				</methods>
 			</class>
 		</classes>
