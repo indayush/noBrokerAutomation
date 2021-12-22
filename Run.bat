@@ -1,4 +1,4 @@
 pushd %~dp0
 call mvn install
-pause
+#pause
 exit
